@@ -1,4 +1,5 @@
 import * as fs from "node:fs";
+import path from "path";
 
 type CharacterSetRule = {
     allow: boolean
@@ -28,7 +29,8 @@ const getRuleFrom0PasswordDB = (domain: string, {referenceMode}: {
     // TODO: Add Online Mode
     let buffer
     try {
-        buffer = fs.readFileSync(`../databases/${domain}/rule.json`)
+        const rulePath = path.join(path.dirname(import.meta.url.replace(/^file:/, '')), '..', 'databases', domain, 'rule.json')
+        buffer = fs.readFileSync(rulePath)
     } catch (error) {
         return null
     }
