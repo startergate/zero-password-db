@@ -21,7 +21,11 @@ type RuleReference = {
     $ref: string
 }
 
-const getRuleFrom0PasswordDB = (domain: string, referenceMode?: boolean) => {
+const getRuleFrom0PasswordDB = (domain: string, {referenceMode}: {
+    referenceMode?: boolean, // Reference mode flag to prevent loop
+    allowOnlineSync?: boolean // Online sync option flag (WIP)
+} = {}) => {
+    // TODO: Add Online Mode
     let buffer
     try {
         buffer = fs.readFileSync(`../databases/${domain}/rule.json`)
@@ -38,7 +42,7 @@ const getRuleFrom0PasswordDB = (domain: string, referenceMode?: boolean) => {
     }
     if (data['$ref']) {
         if (referenceMode) return null
-        else return getRuleFrom0PasswordDB(data['$ref'])
+        else return getRuleFrom0PasswordDB(data['$ref'], {referenceMode: true})
     }
     return data
 }
