@@ -1,7 +1,26 @@
 {
   "name": "zero-password",
-  "module": "src/index.ts",
+  "version": "0.0.1",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist",
+    "databases"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+    },
+    "./*": "./dist/*.js"
+  },
+
+  "scripts": {
+    "build": "npx tsc",
+    "deploy": ""
+  },
+
   "devDependencies": {
     "@types/bun": "latest"
   },
