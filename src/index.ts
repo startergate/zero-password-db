@@ -7,15 +7,25 @@ type CharacterSetRule = {
     usable?: string
 }
 
+type RuleStringLength = {
+    min?: number
+    max?: number
+}
+
 type Rule = {
+    id?: {
+        email?: boolean
+        alphabetUppercase?: CharacterSetRule
+        alphabetLowercase?: CharacterSetRule
+        number?: CharacterSetRule
+        specialCharacter?: CharacterSetRule
+        length?: RuleStringLength
+    }
     alphabetUppercase?: CharacterSetRule
     alphabetLowercase?: CharacterSetRule
     number?: CharacterSetRule
     specialCharacter?: CharacterSetRule
-    length?: {
-        min?: number
-        max?: number
-    }
+    length?: RuleStringLength
 }
 
 type RuleReference = {

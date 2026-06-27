@@ -1,0 +1,22 @@
+{
+  "alphabetUppercase": {
+    "allow": true,
+    "require": false
+  },
+  "alphabetLowercase": {
+    "allow": true,
+    "require": true
+  },
+  "number": {
+    "allow": true,
+    "require": true
+  },
+  "specialCharacter": {
+    "allow": true,
+    "require": true
+  },
+  "length": {
+    "min": 8,
+    "max": 20
+  }
+}
