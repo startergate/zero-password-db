@@ -1,0 +1,19 @@
+# 새 이슈·PR 을 GitHub Project 보드 "0Password"(#11)에 자동으로 추가한다.
+# 상태 변경(닫힘·머지 → Done)은 보드의 기본 Workflows 가 처리한다.
+# 필요한 시크릿: ADD_TO_PROJECT_PAT (project 권한이 있는 토큰)
+name: Add to project
+
+on:
+  issues:
+    types: [opened, reopened, transferred]
+  pull_request_target:
+    types: [opened, reopened]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/add-to-project@v1.0.2
+        with:
+          project-url: https://github.com/users/startergate/projects/11
+          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
