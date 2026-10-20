@@ -22,7 +22,15 @@ findRule("daum.net")      // { domain: "daum.net", rule } | null, `$ref` is reso
 
 ### Lite
 
-The same functions, returning promises. They use the 0Password API (`https://0password.startergate.dev`) and the most persistent storage available: `chrome.storage.local` in extensions, then `localStorage`, then memory.
+The same functions, returning promises. They use the 0Password API (`https://0password.startergate.dev`) and cache fetched rules in the most persistent storage the runtime has:
+
+| Runtime | Default storage |
+| --- | --- |
+| Chrome extension | `chrome.storage.local` |
+| Browser | `localStorage`, or memory when it is blocked |
+| Node, Bun, Deno | `chrome.storage.local` / `localStorage` when present, otherwise one JSON file per domain in `$XDG_CACHE_HOME/zero-password` (`~/.cache/zero-password`) |
+
+The runtime is picked by the `browser` / `node` / `bun` / `deno` export conditions of `zero-password/lite`, so browser bundles never include `node:fs`.
 
 ```ts
 import {getRule, findRule} from "zero-password/lite";
@@ -43,7 +51,7 @@ const {getRule, findRule} = createLiteClient({
 })
 ```
 
-Available storages: `createChromeStorage(area)`, `createWebStorage(localStorage)`, `createMemoryStorage()`, or your own `RuleStorage` (`get(domain)` / `set(domain, value)`).
+Available storages: `createChromeStorage(area)`, `createWebStorage(localStorage)`, `createMemoryStorage()`, `createFileStorage(directory?)` (Node, Bun and Deno only), or your own `RuleStorage` (`get(domain)` / `set(domain, value)`).
 
 A domain the API has no rule for is cached as `null`. Network and server errors throw (`ZeroPasswordApiError` for non-404 responses) and are not cached.
 

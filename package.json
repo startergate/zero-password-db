@@ -14,8 +14,26 @@
       "import": "./dist/index.js"
     },
     "./lite": {
-      "types": "./dist/lite.d.ts",
-      "import": "./dist/lite.js"
+      "browser": {
+        "types": "./dist/lite.d.ts",
+        "import": "./dist/lite.js"
+      },
+      "node": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "bun": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "deno": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "default": {
+        "types": "./dist/lite.d.ts",
+        "import": "./dist/lite.js"
+      }
     }
   },
   "scripts": {
