@@ -13,11 +13,15 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./*": "./dist/*.js"
+    "./lite": {
+      "types": "./dist/lite.d.ts",
+      "import": "./dist/lite.js"
+    }
   },
   "scripts": {
     "build": "npx tsc",
-    "deploy": "tsc & bun publish"
+    "deploy": "tsc & bun publish",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest"

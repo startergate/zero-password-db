@@ -23,5 +23,6 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "include": ["src", "databases"]
+  "include": ["src", "databases"],
+  "exclude": ["src/**/*.test.ts"]
 }

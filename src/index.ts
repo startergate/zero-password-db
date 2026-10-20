@@ -1,62 +1,33 @@
 import * as fs from "node:fs";
 import path from "path";
+import type {Rule, RuleMatch, RuleReference} from "./types.js";
+import {resolveReference} from "./reference.js";
 
-type CharacterSetRule = {
-    allow: boolean
-    require: boolean
-    usable?: string
-}
+export type * from "./types.js";
 
-type RuleStringLength = {
-    min?: number
-    max?: number
-}
-
-type Rule = {
-    id?: {
-        email?: boolean
-        alphabetUppercase?: CharacterSetRule
-        alphabetLowercase?: CharacterSetRule
-        number?: CharacterSetRule
-        specialCharacter?: CharacterSetRule
-        length?: RuleStringLength
-    }
-    alphabetUppercase?: CharacterSetRule
-    alphabetLowercase?: CharacterSetRule
-    number?: CharacterSetRule
-    specialCharacter?: CharacterSetRule
-    length?: RuleStringLength
-}
-
-type RuleReference = {
-    $ref: string
-}
-
-const getRuleFrom0PasswordDB = (domain: string, {referenceMode}: {
-    referenceMode?: boolean, // Reference mode flag to prevent loop
-    allowOnlineSync?: boolean // Online sync option flag (WIP)
-} = {}) => {
-    // TODO: Add Online Mode
-    let buffer
+const readRuleFile = (domain: string): Rule | RuleReference | null => {
+    let text
     try {
         const rulePath = path.join(path.dirname(import.meta.url.replace(/^file:/, '')), '..', 'databases', domain, 'rule.json')
-        buffer = fs.readFileSync(rulePath)
+        text = fs.readFileSync(rulePath).toString()
     } catch (error) {
         return null
     }
-    const text = buffer.toString()
     if (!text) return null
-    let data: Rule & RuleReference
     try {
-        data = JSON.parse(text)
+        return JSON.parse(text)
     } catch (e) {
         return null
     }
-    if (data['$ref']) {
-        if (referenceMode) return null
-        else return getRuleFrom0PasswordDB(data['$ref'], {referenceMode: true})
-    }
-    return data
 }
+
+// Full version: reads the bundled `databases/` directory.
+export const findRule = (domain: string): RuleMatch | null => {
+    const rule = resolveReference(readRuleFile(domain), readRuleFile)
+    if (!rule) return null
+    return {domain, rule}
+}
+
+const getRuleFrom0PasswordDB = (domain: string): Rule | null => findRule(domain)?.rule ?? null
 
 export default getRuleFrom0PasswordDB
