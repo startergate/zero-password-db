@@ -13,11 +13,33 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./*": "./dist/*.js"
+    "./lite": {
+      "browser": {
+        "types": "./dist/lite.d.ts",
+        "import": "./dist/lite.js"
+      },
+      "node": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "bun": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "deno": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "default": {
+        "types": "./dist/lite.d.ts",
+        "import": "./dist/lite.js"
+      }
+    }
   },
   "scripts": {
     "build": "npx tsc",
-    "deploy": "tsc & bun publish"
+    "deploy": "tsc & bun publish",
+    "test": "bun test"
   },
   "devDependencies": {
     "@types/bun": "latest"
