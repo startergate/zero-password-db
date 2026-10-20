@@ -28,6 +28,4 @@ export const findRule = (domain: string): RuleMatch | null => {
     return {domain, rule}
 }
 
-const getRuleFrom0PasswordDB = (domain: string): Rule | null => findRule(domain)?.rule ?? null
-
-export default getRuleFrom0PasswordDB
+export const getRule = (domain: string): Rule | null => findRule(domain)?.rule ?? null

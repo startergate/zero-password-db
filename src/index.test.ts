@@ -1,5 +1,5 @@
 import {expect, test} from "bun:test";
-import getRuleFrom0PasswordDB, {findRule} from "./index";
+import {findRule, getRule} from "./index";
 
 test("finds a rule by its database domain", () => {
     const match = findRule("nid.naver.com")
@@ -8,10 +8,10 @@ test("finds a rule by its database domain", () => {
 })
 
 test("follows $ref to the referenced rule", () => {
-    expect(findRule("daum.net")).toEqual({domain: "daum.net", rule: getRuleFrom0PasswordDB("accounts.kakao.com")!})
+    expect(findRule("daum.net")).toEqual({domain: "daum.net", rule: getRule("accounts.kakao.com")!})
 })
 
 test("returns null for an unknown domain", () => {
     expect(findRule("unknown.example")).toBeNull()
-    expect(getRuleFrom0PasswordDB("unknown.example")).toBeNull()
+    expect(getRule("unknown.example")).toBeNull()
 })

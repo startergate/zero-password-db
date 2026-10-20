@@ -14,39 +14,38 @@ Both versions share the same types (`Rule`, `RuleMatch`, ...) and return `RuleMa
 ### Full
 
 ```ts
-import getRuleFrom0PasswordDB, {findRule} from "zero-password";
+import {getRule, findRule} from "zero-password";
 
-getRuleFrom0PasswordDB("nid.naver.com") // Rule | null
-findRule("daum.net")                    // { domain: "daum.net", rule } | null, `$ref` is resolved
+getRule("nid.naver.com")  // Rule | null
+findRule("daum.net")      // { domain: "daum.net", rule } | null, `$ref` is resolved
 ```
 
 ### Lite
 
+The same functions, returning promises. They use the 0Password API (`https://0password.startergate.dev`) and the most persistent storage available: `chrome.storage.local` in extensions, then `localStorage`, then memory.
+
 ```ts
-import {createLiteClient, type RuleStorage} from "zero-password/lite";
+import {getRule, findRule} from "zero-password/lite";
 
-const client = createLiteClient({
-    apiBaseUrl: "https://<api server>",
-    // optional: defaults to an in-memory storage
-    storage: chromeStorage satisfies RuleStorage,
-    // optional: how long a fetched result stays valid, defaults to one day
-    maxAge: 24 * 60 * 60 * 1000,
-})
-
-await client.getRule("nid.naver.com")  // Rule | null
-await client.findRule("nid.naver.com") // RuleMatch | null
+await getRule("nid.naver.com")  // Rule | null
+await findRule("nid.naver.com") // RuleMatch | null
 ```
+
+To change the defaults, create a client:
+
+```ts
+import {createLiteClient, createChromeStorage} from "zero-password/lite";
+
+const {getRule, findRule} = createLiteClient({
+    apiBaseUrl: "http://localhost:3000",            // default: https://0password.startergate.dev
+    storage: createChromeStorage(chrome.storage.sync), // default: createDefaultStorage()
+    maxAge: 24 * 60 * 60 * 1000,                    // how long a fetched result stays valid, default: one day
+})
+```
+
+Available storages: `createChromeStorage(area)`, `createWebStorage(localStorage)`, `createMemoryStorage()`, or your own `RuleStorage` (`get(domain)` / `set(domain, value)`).
 
 A domain the API has no rule for is cached as `null`. Network and server errors throw (`ZeroPasswordApiError` for non-404 responses) and are not cached.
-
-A `chrome.storage` storage looks like this:
-
-```ts
-const chromeStorage: RuleStorage = {
-    get: async (domain) => (await chrome.storage.local.get(`rule:${domain}`))[`rule:${domain}`],
-    set: (domain, value) => chrome.storage.local.set({[`rule:${domain}`]: value}),
-}
-```
 
 The lite version calls `GET {apiBaseUrl}/api/{domain}`, which answers `200 { domain, rule }` or `404 { error: "not_found" }` (see zero-password-api).
 
