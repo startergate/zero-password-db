@@ -5,7 +5,7 @@
   },
   "alphabetLowercase": {
     "allow": true,
-    "require": true
+    "require": false
   },
   "number": {
     "allow": true,
@@ -13,6 +13,9 @@
   },
   "specialCharacter": {
     "allow": true,
+    "require": true
+  },
+  "alphabet": {
     "require": true
   },
   "length": {
