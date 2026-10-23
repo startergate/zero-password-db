@@ -1,10 +1,10 @@
-import type {CharacterClass, Rule, RuleViolation} from "./types.js";
+import type {CharacterClass, CharacterSetRule, Rule, RuleViolation} from "./types.js";
 
-export const CHARACTER_CLASSES: CharacterClass[] = ['alphabetUppercase', 'alphabetLowercase', 'number', 'specialCharacter']
+export const CHARACTER_CLASSES: CharacterClass[] = ['uppercase', 'lowercase', 'number', 'specialCharacter']
 
 export const characterClassOf = (character: string): CharacterClass | null => {
-    if (/^[A-Z]$/.test(character)) return 'alphabetUppercase'
-    if (/^[a-z]$/.test(character)) return 'alphabetLowercase'
+    if (/^[A-Z]$/.test(character)) return 'uppercase'
+    if (/^[a-z]$/.test(character)) return 'lowercase'
     if (/^[0-9]$/.test(character)) return 'number'
     if (/^[!-~]$/.test(character)) return 'specialCharacter'
     return null
@@ -27,12 +27,22 @@ const isSequenceStep = (step: number) => (previous: string, current: string) => 
         && current.charCodeAt(0) - previous.charCodeAt(0) === step
 }
 
+const characterSets = (rule: Rule) => ({
+    uppercase: {path: 'alphabet.uppercase', rule: rule.alphabet?.uppercase},
+    lowercase: {path: 'alphabet.lowercase', rule: rule.alphabet?.lowercase},
+    number: {path: 'number', rule: rule.number},
+    specialCharacter: {path: 'specialCharacter', rule: rule.specialCharacter},
+} as const satisfies Record<CharacterClass, {path: string, rule?: CharacterSetRule}>)
+
+const isLetter = (kind: CharacterClass) => kind === 'uppercase' || kind === 'lowercase'
+
 // Checks a password against a rule, locally. Returns the parts of the rule the password breaks,
 // or an empty array when it satisfies the rule. Pass `id` to check `forbidden.id`.
 export const checkPassword = (rule: Rule, password: string, options: {id?: string} = {}): RuleViolation[] => {
     const violations = new Set<RuleViolation>()
     const characters = Array.from(password)
     const used = new Set<CharacterClass>()
+    const sets = characterSets(rule)
 
     for (const character of characters) {
         const kind = characterClassOf(character)
@@ -41,21 +51,23 @@ export const checkPassword = (rule: Rule, password: string, options: {id?: strin
             continue
         }
         used.add(kind)
-        const classRule = rule[kind]
-        if (classRule && !classRule.allow) violations.add(`${kind}.allow`)
-        else if (classRule?.usable !== undefined && !classRule.usable.includes(character)) violations.add(`${kind}.usable`)
+        const {path, rule: setRule} = sets[kind]
+        if (isLetter(kind) && rule.alphabet && !rule.alphabet.allow) violations.add('alphabet.allow')
+        else if (setRule && !setRule.allow) violations.add(`${path}.allow`)
+        else if (setRule?.usable !== undefined && !setRule.usable.includes(character)) violations.add(`${path}.usable`)
         if (rule.forbidden?.characters?.includes(character)) violations.add('forbidden.characters')
     }
 
+    const usedLetter = used.has('uppercase') || used.has('lowercase')
+    if (rule.alphabet?.require && !usedLetter) violations.add('alphabet.require')
     for (const kind of CHARACTER_CLASSES) {
-        if (rule[kind]?.require && !used.has(kind)) violations.add(`${kind}.require`)
-    }
-    if (rule.alphabet?.require && !used.has('alphabetUppercase') && !used.has('alphabetLowercase')) {
-        violations.add('alphabet.require')
+        const {path, rule: setRule} = sets[kind]
+        if (setRule?.require && !used.has(kind)) violations.add(`${path}.require`)
     }
     if (rule.combination) {
         const of = rule.combination.of ?? CHARACTER_CLASSES
-        if (of.filter((kind) => used.has(kind)).length < rule.combination.min) violations.add('combination')
+        const count = of.filter((kind) => kind === 'alphabet' ? usedLetter : used.has(kind)).length
+        if (count < rule.combination.min) violations.add('combination')
     }
 
     const {maxRepeat, maxSequence, id} = rule.forbidden ?? {}

@@ -9,18 +9,25 @@ export type RuleStringLength = {
     max?: number
 }
 
-export type CharacterClass = 'alphabetUppercase' | 'alphabetLowercase' | 'number' | 'specialCharacter'
-
-// Letters of either case, for sites that ask for "영문" without caring about the case.
+// Letters of either case. `allow` / `require` apply to letters as a whole ("영문 필수" is `require: true`),
+// and `uppercase` / `lowercase` narrow them down by case.
 export type AlphabetRule = {
+    allow: boolean
     require: boolean
+    uppercase?: CharacterSetRule
+    lowercase?: CharacterSetRule
 }
+
+export type CharacterClass = 'uppercase' | 'lowercase' | 'number' | 'specialCharacter'
+
+// A class counted by `combination`. `alphabet` counts letters of either case as one class.
+export type CombinationClass = CharacterClass | 'alphabet'
 
 // "영문·숫자·특수문자 중 2가지 이상": at least `min` of the classes in `of` must appear.
 export type CombinationRule = {
     min: number
-    // default: all four classes
-    of?: CharacterClass[]
+    // default: uppercase, lowercase, number, specialCharacter
+    of?: CombinationClass[]
 }
 
 export type ForbiddenRule = {
@@ -34,15 +41,12 @@ export type ForbiddenRule = {
     id?: boolean
 }
 
-// Character classes are ASCII only: uppercase A-Z, lowercase a-z, number 0-9 and
-// specialCharacter for the other printable characters (! to ~). Anything else, such as a space
-// or non-ASCII letters, is never allowed.
+// Characters are ASCII only: letters A-Z and a-z, number 0-9 and specialCharacter for the other
+// printable characters (! to ~). Anything else, such as a space or non-ASCII letters, is never allowed.
 export type Rule = {
-    alphabetUppercase?: CharacterSetRule
-    alphabetLowercase?: CharacterSetRule
+    alphabet?: AlphabetRule
     number?: CharacterSetRule
     specialCharacter?: CharacterSetRule
-    alphabet?: AlphabetRule
     combination?: CombinationRule
     forbidden?: ForbiddenRule
     length?: RuleStringLength
@@ -58,11 +62,14 @@ export type RuleMatch = {
     rule: Rule
 }
 
+type CharacterSetPath = 'alphabet.uppercase' | 'alphabet.lowercase' | 'number' | 'specialCharacter'
+
 export type RuleViolation =
-    | `${CharacterClass}.allow`
-    | `${CharacterClass}.require`
-    | `${CharacterClass}.usable`
+    | 'alphabet.allow'
     | 'alphabet.require'
+    | `${CharacterSetPath}.allow`
+    | `${CharacterSetPath}.require`
+    | `${CharacterSetPath}.usable`
     | 'combination'
     | 'forbidden.characters'
     | 'forbidden.maxRepeat'
