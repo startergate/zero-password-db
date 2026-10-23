@@ -108,3 +108,19 @@ test("default storage prefers chrome.storage.local", async () => {
         delete scope.chrome
     }
 })
+
+test("normalizes the domain before fetching and caching", async () => {
+    const {calls, fetcher} = fakeFetch(() => Response.json({domain: "www.coupang.com", rule}))
+    const client = createLiteClient({apiBaseUrl: "https://api.example", fetch: fetcher, storage: createMemoryStorage()})
+    expect(await client.findRule("Login.Coupang.com.")).toEqual({domain: "www.coupang.com", rule})
+    expect(await client.findRule("login.coupang.com")).toEqual({domain: "www.coupang.com", rule})
+    expect(calls).toEqual(["https://api.example/api/login.coupang.com"])
+})
+
+test("returns null for an invalid domain without a request", async () => {
+    const {calls, fetcher} = fakeFetch(() => Response.json({domain: "a.example", rule}))
+    const client = createLiteClient({apiBaseUrl: "https://api.example", fetch: fetcher, storage: createMemoryStorage()})
+    expect(await client.findRule("../a.example")).toBeNull()
+    expect(await client.getRule("localhost")).toBeNull()
+    expect(calls).toEqual([])
+})

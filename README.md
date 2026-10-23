@@ -11,6 +11,17 @@ This library is provided in two forms, full and lite version.
 
 Both versions share the same types (`Rule`, `RuleMatch`, ...) and return `RuleMatch` (`{ domain, rule }`), where `domain` is the database entry that matched.
 
+### Domain matching
+
+Pass a host name such as `location.hostname`. It is lowercased, and anything that is not a host name (paths, `../`, ports, single labels like `localhost`) finds no rule.
+A host name is matched against the database in this order, and `RuleMatch.domain` tells which entry matched:
+
+1. the host itself (`login.coupang.com`)
+2. its parent domains, down to the registrable domain (`coupang.com`); multi-label public suffixes like `co.kr` are never crossed
+3. `www.` + the registrable domain (`www.coupang.com`)
+
+`normalizeDomain(host)` and `candidateDomains(host)` are exported from both versions. The lite version sends the normalized host name to the API, which does the matching.
+
 ### Full
 
 ```ts

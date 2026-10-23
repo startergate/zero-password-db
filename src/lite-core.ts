@@ -1,6 +1,8 @@
 import type {Rule, RuleMatch} from "./types.js";
+import {normalizeDomain} from "./domain.js";
 
 export type * from "./types.js";
+export {candidateDomains, normalizeDomain} from "./domain.js";
 
 export type CachedRule = {
     match: RuleMatch | null // null records that the API has no rule for the domain
@@ -112,8 +114,12 @@ const createClient = (
         return await response.json() as RuleMatch
     }
 
+    // The API matches parent domains itself, so one request per host name is enough.
+    // Invalid host names resolve to null without a request.
     // Network and server errors are thrown and not cached, so the next call retries.
-    const findRule = async (domain: string): Promise<RuleMatch | null> => {
+    const findRule = async (input: string): Promise<RuleMatch | null> => {
+        const domain = normalizeDomain(input)
+        if (!domain) return null
         const cached = await store.get(domain)
         if (cached && Date.now() - cached.fetchedAt < maxAge) return cached.match
         const match = await fetchRule(domain)
