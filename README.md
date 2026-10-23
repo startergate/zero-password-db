@@ -70,6 +70,8 @@ The lite version calls `GET {apiBaseUrl}/api/{domain}`, which answers `200 { dom
 
 ### Rule format
 
+To add or fix a site's rule, see [CONTRIBUTING.md](CONTRIBUTING.md). Filing a [rule request issue](https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml) opens the pull request for you.
+
 Each `databases/<domain>/rule.json` is a `Rule`, or `{ "$ref": "<domain>" }` to reuse another entry's rule. Every field is optional.
 
 | Field | Meaning |
