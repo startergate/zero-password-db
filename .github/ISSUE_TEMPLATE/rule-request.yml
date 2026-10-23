@@ -1,0 +1,61 @@
+name: Password rule request
+description: Add a site's password rule, or fix an existing one. A pull request is opened from this issue automatically.
+title: "[Rule] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Filling this form opens a pull request that writes `databases/<domain>/rule.json`.
+        See [CONTRIBUTING.md](https://github.com/startergate/zero-password-db/blob/develop/CONTRIBUTING.md) for how to pick the domain and write the rule.
+        Never paste a real password here.
+  - type: input
+    id: domain
+    attributes:
+      label: Domain
+      description: Host name of the page where the password is set, e.g. `nid.naver.com`. No `https://` or path.
+      placeholder: nid.naver.com
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type
+      options:
+        - Add a new site
+        - Change an existing rule
+    validations:
+      required: true
+  - type: textarea
+    id: guidance
+    attributes:
+      label: Password guidance on the site
+      description: The rule text exactly as the sign-up or password change page shows it.
+      placeholder: 영문, 숫자, 특수문자 중 2가지 이상 조합하여 8~16자
+    validations:
+      required: true
+  - type: input
+    id: page
+    attributes:
+      label: Page checked
+      description: URL of the page you read the guidance from.
+      placeholder: https://nid.naver.com/user2/join
+    validations:
+      required: true
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: Optional. A screenshot of the guidance helps reviewers.
+  - type: textarea
+    id: rule
+    attributes:
+      label: Rule JSON
+      description: 'The whole `rule.json`, or `{ "$ref": "<domain>" }` to reuse another entry''s rule.'
+      render: json
+      placeholder: |
+        {
+          "combination": { "min": 2, "of": ["alphabet", "number", "specialCharacter"] },
+          "length": { "min": 8, "max": 16 }
+        }
+    validations:
+      required: true
