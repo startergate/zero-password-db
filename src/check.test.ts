@@ -13,18 +13,15 @@ test("checks length in characters", () => {
 
 test("checks required and disallowed character classes", () => {
     const rule: Rule = {
-        alphabet: {allow: true, require: false, uppercase: {allow: true, require: true}},
+        alphabet: {require: false, uppercase: {allow: true, require: true}},
         number: {allow: false, require: false},
     }
     expect(checkPassword(rule, "abc1")).toEqual(["number.allow", "alphabet.uppercase.require"])
     expect(checkPassword(rule, "Abc")).toEqual([])
 })
 
-test("alphabet.allow disallows letters of both cases", () => {
-    const rule: Rule = {alphabet: {allow: false, require: false}}
-    expect(checkPassword(rule, "1234")).toEqual([])
-    expect(checkPassword(rule, "12aB")).toEqual(["alphabet.allow"])
-    const noUppercase: Rule = {alphabet: {allow: true, require: false, uppercase: {allow: false, require: false}}}
+test("disallows letters per case", () => {
+    const noUppercase: Rule = {alphabet: {require: false, uppercase: {allow: false, require: false}}}
     expect(checkPassword(noUppercase, "12a")).toEqual([])
     expect(checkPassword(noUppercase, "12A")).toEqual(["alphabet.uppercase.allow"])
 })
@@ -41,7 +38,7 @@ test("rejects spaces and non-ASCII characters", () => {
 })
 
 test("alphabet requires a letter of either case", () => {
-    const rule: Rule = {alphabet: {allow: true, require: true}}
+    const rule: Rule = {alphabet: {require: true}}
     expect(checkPassword(rule, "1234A")).toEqual([])
     expect(checkPassword(rule, "1234a")).toEqual([])
     expect(checkPassword(rule, "1234!")).toEqual(["alphabet.require"])

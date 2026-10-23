@@ -1,6 +1,5 @@
 {
   "alphabet": {
-    "allow": true,
     "require": false,
     "uppercase": {
       "allow": true,

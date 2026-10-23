@@ -34,8 +34,6 @@ const characterSets = (rule: Rule) => ({
     specialCharacter: {path: 'specialCharacter', rule: rule.specialCharacter},
 } as const satisfies Record<CharacterClass, {path: string, rule?: CharacterSetRule}>)
 
-const isLetter = (kind: CharacterClass) => kind === 'uppercase' || kind === 'lowercase'
-
 // Checks a password against a rule, locally. Returns the parts of the rule the password breaks,
 // or an empty array when it satisfies the rule. Pass `id` to check `forbidden.id`.
 export const checkPassword = (rule: Rule, password: string, options: {id?: string} = {}): RuleViolation[] => {
@@ -52,8 +50,7 @@ export const checkPassword = (rule: Rule, password: string, options: {id?: strin
         }
         used.add(kind)
         const {path, rule: setRule} = sets[kind]
-        if (isLetter(kind) && rule.alphabet && !rule.alphabet.allow) violations.add('alphabet.allow')
-        else if (setRule && !setRule.allow) violations.add(`${path}.allow`)
+        if (setRule && !setRule.allow) violations.add(`${path}.allow`)
         else if (setRule?.usable !== undefined && !setRule.usable.includes(character)) violations.add(`${path}.usable`)
         if (rule.forbidden?.characters?.includes(character)) violations.add('forbidden.characters')
     }

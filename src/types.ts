@@ -9,10 +9,9 @@ export type RuleStringLength = {
     max?: number
 }
 
-// Letters of either case. `allow` / `require` apply to letters as a whole ("영문 필수" is `require: true`),
-// and `uppercase` / `lowercase` narrow them down by case.
+// Letters. `require` asks for at least one letter of either case ("영문 필수"), which per-case `require`
+// cannot express. Whether letters are allowed at all is up to `uppercase` / `lowercase`.
 export type AlphabetRule = {
-    allow: boolean
     require: boolean
     uppercase?: CharacterSetRule
     lowercase?: CharacterSetRule
@@ -65,7 +64,6 @@ export type RuleMatch = {
 type CharacterSetPath = 'alphabet.uppercase' | 'alphabet.lowercase' | 'number' | 'specialCharacter'
 
 export type RuleViolation =
-    | 'alphabet.allow'
     | 'alphabet.require'
     | `${CharacterSetPath}.allow`
     | `${CharacterSetPath}.require`

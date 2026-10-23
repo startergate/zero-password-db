@@ -74,7 +74,7 @@ Each `databases/<domain>/rule.json` is a `Rule`, or `{ "$ref": "<domain>" }` to 
 
 | Field | Meaning |
 | --- | --- |
-| `alphabet` | `{ allow, require, uppercase?, lowercase? }`: `allow` / `require` apply to letters of either case ("영문 필수" is `require: true`), and `uppercase` / `lowercase` are `{ allow, require, usable? }` for A-Z and a-z. |
+| `alphabet` | `{ require, uppercase?, lowercase? }`: `require` asks for at least one letter of either case ("영문 필수"), and `uppercase` / `lowercase` are `{ allow, require, usable? }` for A-Z and a-z. |
 | `number`, `specialCharacter` | `{ allow, require, usable? }` for 0-9 and the other printable ASCII characters (`!` to `~`). `usable` lists the only characters of that class the site accepts. |
 | `combination` | `{ min, of? }`: at least `min` of the classes in `of`, from `uppercase`, `lowercase`, `number`, `specialCharacter` and `alphabet` (either case, counted once). The default is the first four. "영문·숫자·특수문자 중 2가지 이상" is `{ "min": 2, "of": ["alphabet", "number", "specialCharacter"] }`. |
 | `forbidden` | `{ characters?, maxRepeat?, maxSequence?, id? }`: characters never allowed, the longest run of one character (`"aaa"` is 3), the longest ascending or descending run of letters or digits (`"abc"`, `"321"` are 3), and whether the account id may not appear. |
