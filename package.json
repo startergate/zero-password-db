@@ -1,6 +1,6 @@
 {
   "name": "zero-password",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -13,16 +13,36 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./*": "./dist/*.js"
+    "./lite": {
+      "browser": {
+        "types": "./dist/lite.d.ts",
+        "import": "./dist/lite.js"
+      },
+      "node": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "bun": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "deno": {
+        "types": "./dist/lite.node.d.ts",
+        "import": "./dist/lite.node.js"
+      },
+      "default": {
+        "types": "./dist/lite.d.ts",
+        "import": "./dist/lite.js"
+      }
+    }
   },
   "scripts": {
-    "build": "npx tsc",
-    "deploy": "tsc & bun publish"
+    "build": "rm -rf dist && tsc",
+    "test": "bun test",
+    "deploy": "bun test && bun run build && bun publish"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5"
   }
 }

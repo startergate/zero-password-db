@@ -1,11 +1,14 @@
 {
-  "alphabetUppercase": {
-    "allow": true,
-    "require": false
-  },
-  "alphabetLowercase": {
-    "allow": true,
-    "require": false
+  "alphabet": {
+    "require": false,
+    "uppercase": {
+      "allow": true,
+      "require": false
+    },
+    "lowercase": {
+      "allow": true,
+      "require": false
+    }
   },
   "number": {
     "allow": true,
