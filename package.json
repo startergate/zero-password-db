@@ -37,14 +37,12 @@
     }
   },
   "scripts": {
-    "build": "npx tsc",
-    "deploy": "tsc & bun publish",
-    "test": "bun test"
+    "build": "rm -rf dist && tsc",
+    "test": "bun test",
+    "deploy": "bun test && bun run build && bun publish"
   },
   "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
+    "@types/bun": "latest",
     "typescript": "^5"
   }
 }
