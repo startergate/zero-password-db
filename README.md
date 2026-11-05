@@ -11,6 +11,27 @@ This library is provided in two forms, full and lite version.
 
 Both versions share the same types (`Rule`, `RuleMatch`, ...) and return `RuleMatch` (`{ domain, rule }`), where `domain` is the database entry that matched.
 
+### Install
+
+The package is published to npm as `zero-password`:
+
+```sh
+bun add zero-password
+```
+
+It is also published to GitHub Packages as `@startergate/zero-password`. GitHub Packages needs a token with `read:packages` even for public packages, so add this to your `.npmrc` (or `bunfig.toml`) first:
+
+```
+@startergate:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}
+```
+
+```sh
+bun add @startergate/zero-password
+```
+
+Imports then use the scoped name, e.g. `@startergate/zero-password/lite`.
+
 ### Domain matching
 
 Pass a host name such as `location.hostname`. It is lowercased, and anything that is not a host name (paths, `../`, ports, single labels like `localhost`) finds no rule.
