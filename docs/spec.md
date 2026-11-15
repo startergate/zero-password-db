@@ -152,7 +152,7 @@
 
 ### 6.1 지금
 
-- npmjs에만 배포한다(GitHub Packages는 쓰지 않음). 패키지 이름 `zero-password`, 현재 0.1.0.
+- npmjs에만 배포한다(GitHub Packages는 쓰지 않음). 패키지 이름 `zero-password`, 현재 0.2.0.
 - `bun run deploy` = 테스트 → 빌드(`tsc`) → `bun publish`. 호승 맥에서 npm 로그인으로 실행한다.
 - npm 배포 뒤 api의 의존성을 올려 Vercel에 재배포해야 API가 새 규칙을 준다.
 
