@@ -86,6 +86,15 @@ Characters outside the four classes, such as spaces or non-ASCII letters, are ne
 
 `checkPassword(rule, password, { id? })` checks a password against a rule locally and returns the broken parts (`RuleViolation[]`, e.g. `["alphabet.require", "length.min"]`), or `[]`. It is exported from both versions and never sends the password anywhere.
 
+`describeRule(rule, { locale? })` turns a rule into the lines to show, in order (`RuleLine[]`). Each line has its `text`, the `violations` it stands for (match them with `checkPassword`), and `characters` when a character list is too long for the text. Built-in languages are English and Korean; `locale` takes any tag (`ko-KR`, `en-US`) and other languages fall back to English. Classes that are allowed but not required give no line. The last line always stands for `unsupportedCharacter` (spaces, emoji, non-ASCII letters) and has `onlyWhenUnmet: true`: show it only while the input breaks it.
+
+```ts
+describeRule({ length: { min: 8, max: 16 }, number: { allow: true, require: true } }, { locale: 'ko' })
+// [{ text: '8~16자', violations: ['length.min', 'length.max'] },
+//  { text: '숫자 포함', violations: ['number.require'] },
+//  { text: '공백·한글·이모지 등 사용 불가', violations: ['unsupportedCharacter'], onlyWhenUnmet: true }]
+```
+
 To install dependencies:
 
 ```bash
