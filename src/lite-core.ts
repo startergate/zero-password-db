@@ -4,6 +4,7 @@ import {normalizeDomain} from "./domain.js";
 export type * from "./types.js";
 export {candidateDomains, normalizeDomain} from "./domain.js";
 export {CHARACTER_CLASSES, characterClassOf, checkPassword} from "./check.js";
+export {describeRule, resolveLocale, MAX_INLINE_CHARACTERS, type RuleLine, type DescribeOptions, type DescribeLocale} from "./describe.js";
 
 export type CachedRule = {
     match: RuleMatch | null // null records that the API has no rule for the domain
