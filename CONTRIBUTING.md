@@ -5,7 +5,7 @@ This guide explains how to pick the domain, write the rule and get it merged.
 
 There are two ways to contribute a rule:
 
-- **Open a rule request issue** (easiest). Fill the [Password rule request](https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml) form and a pull request is opened for you. See [Rule request issues](#rule-request-issues).
+- **Open a rule request issue** (easiest). Fill the [Password rule request](https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml) form field by field, without writing JSON, and a pull request is opened for you. See [Rule request issues](#rule-request-issues).
 - **Open a pull request yourself.** Add or edit `databases/<domain>/rule.json` on a branch, run `bun test`, and open a pull request to `develop`.
 
 Never put a real password in an issue, a pull request or a rule.
@@ -144,7 +144,7 @@ In the pull request, include the site's guidance text and the URL of the page yo
 
 ## Rule request issues
 
-The [Password rule request](https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml) form (`.github/ISSUE_TEMPLATE/rule-request.yml`) asks for:
+The [Password rule request](https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml) form (`.github/ISSUE_TEMPLATE/rule-request.yml`) asks about the request first:
 
 | Field | |
 | --- | --- |
@@ -153,11 +153,25 @@ The [Password rule request](https://github.com/startergate/zero-password-db/issu
 | Password guidance on the site | The guidance text exactly as the site shows it. |
 | Page checked | The URL of the page the guidance comes from. |
 | Screenshots | Optional. |
-| Rule JSON | The whole `rule.json`, or a `$ref`. |
+
+Then it asks for the rule, one field per part of [`rule.json`](#writing-rulejson). Every rule field is optional, and an empty field means the site does not restrict it, so that part is left out of `rule.json`.
+
+| Field | Becomes |
+| --- | --- |
+| Minimum length, Maximum length | `length.min`, `length.max` |
+| Uppercase letters, Lowercase letters, Numbers, Special characters | `alphabet.uppercase`, `alphabet.lowercase`, `number`, `specialCharacter`: "Not allowed" is `allow: false`, "Allowed" is `allow: true`, "Required" is `allow: true, require: true`. "No limit" (the default) leaves it out. |
+| Usable uppercase letters, ... | that class's `usable`. Its class must be "Allowed" or "Required". |
+| Letters: "At least one letter of either case is required" | `alphabet.require` |
+| Combination minimum, Combination kinds | `combination.min`, `combination.of`. "Letters" is `alphabet`. With no kind checked, `of` is left out and the default applies. |
+| Longest repeat, Longest sequence, Forbidden characters, Account id | `forbidden.maxRepeat`, `forbidden.maxSequence`, `forbidden.characters`, `forbidden.id` |
+| Same rule as | `{ "$ref": "<domain>" }`. Leave every other rule field empty. |
+| Rule JSON | The whole `rule.json`, for when you would rather write it yourself. Leave every other rule field empty. |
+
+When you report a wrong rule from the extension, it fills **Rule JSON** with the current rule. Edit that JSON, or clear it and fill the fields instead.
 
 When the issue is opened, the [Rule request workflow](.github/workflows/rule-request.yml) runs:
 
-1. `scripts/rule-request.ts` reads the issue and checks it: the domain must be a host name, the request type must match whether the domain already has a rule, and the JSON must be a valid rule or `$ref`. It then writes `databases/<domain>/rule.json`.
+1. `scripts/rule-request.ts` reads the issue and checks it: the domain must be a host name, the request type must match whether the domain already has a rule, the rule must come from exactly one of the rule fields, **Same rule as** or **Rule JSON**, numbers must be whole numbers, and the result must be a valid rule or `$ref`. It then writes `databases/<domain>/rule.json`, with keys in the order of the `Rule` type.
 2. `bun test src/rules.test.ts` runs against the new file.
 3. The change is committed to `feature/rule-request-<issue number>` and a pull request to `develop` is opened. The workflow comments the link on the issue.
 
@@ -169,6 +183,7 @@ The workflow only handles issues whose title starts with `[Rule]` and that were 
 
 - The workflow needs **Settings → Actions → General → Workflow permissions → "Allow GitHub Actions to create and approve pull requests"** to be enabled. Without it, the pull request step fails and the workflow comments a link to the failed run on the issue.
 - Review the generated pull request against the guidance and screenshots in the issue before merging. The workflow only checks that the rule is well formed, not that it matches the site.
+- `scripts/rule-request.ts` reads the issue by field label (`FIELD`). When you rename a field in the form, rename it there too; `bun test` checks that they match.
 - Pull requests opened with the workflow's token do not trigger other workflows. Run `bun test` locally if you change the branch.
 - The base is `develop`, so merging does not close the issue. Close it by hand after merging.
 
