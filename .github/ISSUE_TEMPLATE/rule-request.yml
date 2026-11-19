@@ -6,7 +6,7 @@ body:
     attributes:
       value: |
         Filling this form opens a pull request that writes `databases/<domain>/rule.json`.
-        See [CONTRIBUTING.md](https://github.com/startergate/zero-password-db/blob/develop/CONTRIBUTING.md) for how to pick the domain and write the rule.
+        See [CONTRIBUTING.md](https://github.com/startergate/zero-password-db/blob/develop/CONTRIBUTING.md) for how to pick the domain and read the site's guidance.
         Never paste a real password here.
   - type: input
     id: domain
@@ -46,16 +46,140 @@ body:
     attributes:
       label: Screenshots
       description: Optional. A screenshot of the guidance helps reviewers.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Rule
+        Fill only what the site's guidance says. Every field below is optional, and a field left empty means the site does not restrict it.
+  - type: input
+    id: length_min
+    attributes:
+      label: Minimum length
+      description: Fewest characters allowed.
+      placeholder: "8"
+  - type: input
+    id: length_max
+    attributes:
+      label: Maximum length
+      description: Most characters allowed.
+      placeholder: "16"
+  - type: dropdown
+    id: uppercase
+    attributes:
+      label: Uppercase letters (A-Z)
+      description: '"Allowed" means they may be used, "Required" means at least one must be used.'
+      options:
+        - No limit
+        - Not allowed
+        - Allowed
+        - Required
+      default: 0
+  - type: dropdown
+    id: lowercase
+    attributes:
+      label: Lowercase letters (a-z)
+      options:
+        - No limit
+        - Not allowed
+        - Allowed
+        - Required
+      default: 0
+  - type: dropdown
+    id: number
+    attributes:
+      label: Numbers (0-9)
+      options:
+        - No limit
+        - Not allowed
+        - Allowed
+        - Required
+      default: 0
+  - type: dropdown
+    id: special
+    attributes:
+      label: Special characters
+      description: Every printable ASCII character other than letters and numbers, from `!` to `~`.
+      options:
+        - No limit
+        - Not allowed
+        - Allowed
+        - Required
+      default: 0
+  - type: input
+    id: uppercase_usable
+    attributes:
+      label: Usable uppercase letters
+      description: Only when the site accepts just some of them. List every accepted character, e.g. `ABC`.
+  - type: input
+    id: lowercase_usable
+    attributes:
+      label: Usable lowercase letters
+      description: Only when the site accepts just some of them.
+  - type: input
+    id: number_usable
+    attributes:
+      label: Usable numbers
+      description: Only when the site accepts just some of them.
+  - type: input
+    id: special_usable
+    attributes:
+      label: Usable special characters
+      description: Only when the site accepts just some of them, e.g. `!@#$%^&*`.
+  - type: checkboxes
+    id: alphabet_required
+    attributes:
+      label: Letters
+      options:
+        - label: At least one letter of either case is required
+  - type: input
+    id: combination_min
+    attributes:
+      label: Combination minimum
+      description: For guidance like "at least 2 of letters, numbers and special characters", the number of kinds (here `2`).
+      placeholder: "2"
+  - type: checkboxes
+    id: combination_of
+    attributes:
+      label: Combination kinds
+      description: The kinds the site counts. Leave all unchecked if it counts uppercase, lowercase, numbers and special characters separately.
+      options:
+        - label: Letters (either case counts as one kind)
+        - label: Uppercase letters
+        - label: Lowercase letters
+        - label: Numbers
+        - label: Special characters
+  - type: input
+    id: max_repeat
+    attributes:
+      label: Longest repeat
+      description: The most times the same character may appear in a row. "3 or more in a row is not allowed" is `2`.
+  - type: input
+    id: max_sequence
+    attributes:
+      label: Longest sequence
+      description: The longest run of consecutive characters such as `abc` or `321` that is allowed. "3 or more consecutive characters are not allowed" is `2`.
+  - type: input
+    id: forbidden_characters
+    attributes:
+      label: Forbidden characters
+      description: Characters that may never be used, even when their kind is allowed.
+  - type: checkboxes
+    id: no_id
+    attributes:
+      label: Account id
+      options:
+        - label: The password must not contain the account id
+  - type: input
+    id: ref
+    attributes:
+      label: Same rule as
+      description: When this site shares its accounts with another entry, that entry's domain, e.g. `accounts.kakao.com`. Leave every other rule field empty.
   - type: textarea
     id: rule
     attributes:
       label: Rule JSON
-      description: 'The whole `rule.json`, or `{ "$ref": "<domain>" }` to reuse another entry''s rule.'
+      description: |
+        Optional. The whole `rule.json`, for when you would rather write the rule than fill the fields above. Leave every other rule field empty when you use it.
+        The extension fills this with the current rule when you report a wrong rule. Edit it, or clear it and fill the fields above instead.
       render: json
-      placeholder: |
-        {
-          "combination": { "min": 2, "of": ["alphabet", "number", "specialCharacter"] },
-          "length": { "min": 8, "max": 16 }
-        }
-    validations:
-      required: true

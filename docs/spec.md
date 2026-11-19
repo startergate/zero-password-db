@@ -120,33 +120,36 @@
 
 ### 5.1 지금 흐름
 
-1. 누구나 db 저장소의 **Password rule request** 이슈 폼(`.github/ISSUE_TEMPLATE/rule-request.yml`)을 채운다. 항목: 도메인, 요청 종류(추가/수정), 사이트 안내 문구, 확인한 페이지 URL, 스크린샷(선택), 규칙 JSON.
-2. `.github/workflows/rule-request.yml`이 이슈 내용으로 `rule.json`을 쓰고 `src/rules.test.ts`를 돌린 뒤 `feature/rule-request-<이슈 번호>` 브랜치로 `develop` 대상 PR을 연다. 이슈를 고치면 PR도 갱신된다. 문제가 있으면 이슈에 댓글로 알린다.
+1. 누구나 db 저장소의 **Password rule request** 이슈 폼(`.github/ISSUE_TEMPLATE/rule-request.yml`)을 채운다. 기본 항목(도메인, 요청 종류, 사이트 안내 문구, 확인한 페이지 URL, 스크린샷)과 규칙 항목(§5.2)이 있다.
+2. `.github/workflows/rule-request.yml`이 `scripts/rule-request.ts`로 이슈 내용에서 `rule.json`을 만들고 `src/rules.test.ts`를 돌린 뒤 `feature/rule-request-<이슈 번호>` 브랜치로 `develop` 대상 PR을 연다. 이슈를 고치면 PR도 갱신된다. 문제가 있으면 PR을 열지 않고 이슈에 댓글로 알린다.
 3. 관리자(호승)가 PR을 검토해 머지한다.
 4. 직접 PR을 여는 방법도 있다. 방법은 `CONTRIBUTING.md`.
 
-### 5.2 항목 입력식 이슈 폼 **[계획]**
+### 5.2 항목 입력식 이슈 폼
 
-지금 폼은 제보자가 규칙 JSON을 직접 써야 한다. 이를 바꾼다(2026-11-05 확정).
+제보자는 규칙 JSON을 직접 쓰지 않고 폼의 항목에 값을 채운다. JSON은 workflow가 항목 값으로 만든다(2026-11-05 확정, 2026-11-15 구현).
 
-- 제보자는 폼의 항목(길이, 문자 종류, 조합, 금지 조건 등)에 값을 채운다. JSON은 workflow가 항목 값으로 만든다.
-- 익스텐션 팝업의 "제보하기" 버튼은 이 폼을 도메인을 미리 채워 연다: `https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml&domain=<호스트>`. GitHub 이슈 폼은 필드 id로 쿼리 값을 미리 채울 수 있다.
+- 익스텐션 팝업의 "제보하기" 버튼은 이 폼을 도메인을 미리 채워 연다: `https://github.com/startergate/zero-password-db/issues/new?template=rule-request.yml&domain=<호스트>`. GitHub 이슈 폼은 필드 id로 쿼리 값을 미리 채울 수 있다. 미리 채우는 필드 id는 `domain`, `type`, `page`, `rule`(chrome spec §6).
 - 제보에는 GitHub 계정이 필요하다. 계정 없는 사용자를 위한 별도 창구는 1.0에서 두지 않는다.
-- 항목 구성(2026-11-05 확정). 규칙 항목은 모두 선택이고, 빈칸은 제한 없음으로 본다.
+- 항목 구성. 규칙 항목은 모두 선택이고, 빈칸은 제한 없음으로 본다(그 필드를 `rule.json`에서 뺀다).
 
-| 묶음 | 항목 | 입력 방식 | `Rule` 필드 |
+| 묶음 | 항목 | 입력 방식 (필드 id) | `Rule` 필드 |
 |---|---|---|---|
-| 기본 | 도메인, 요청 종류(추가/수정), 사이트 안내 문구, 확인한 페이지 URL, 스크린샷 | 입력란·드롭다운 | (JSON 밖) |
-| 길이 | 최소 글자 수, 최대 글자 수 | 입력란 | `length.min`, `length.max` |
-| 문자 종류 | 영문 대문자, 영문 소문자, 숫자, 특수문자 | 드롭다운: 사용 불가 / 사용 가능 / 반드시 포함 | `alphabet.uppercase`, `alphabet.lowercase`, `number`, `specialCharacter`의 `allow`, `require` |
-| 사용 가능한 문자 | 위 네 종류 각각, 허용되는 문자만 나열 | 입력란 | 각 종류의 `usable` |
-| 영문 필수 | 대소문자 상관없이 영문 1자 이상 | 체크박스 | `alphabet.require` |
-| 조합 | 몇 가지 이상, 셀 종류(영문, 대문자, 소문자, 숫자, 특수문자) | 숫자 입력란(1부터 셀 종류 개수까지), 체크박스 | `combination.min`, `combination.of` |
-| 금지 | 같은 문자 연속 최대 개수, 연속 문자 최대 길이, 아이디 포함 금지, 금지 문자 | 입력란·체크박스 | `forbidden.maxRepeat`, `forbidden.maxSequence`, `forbidden.id`, `forbidden.characters` |
-| 참조 | 다른 항목 규칙 그대로 쓰기 | 입력란(도메인). 채우면 다른 규칙 항목은 비워야 함 | `$ref` |
+| 기본 | 도메인, 요청 종류(추가/수정), 사이트 안내 문구, 확인한 페이지 URL, 스크린샷 | 입력란·드롭다운 (`domain`, `type`, `guidance`, `page`, `screenshots`) | (JSON 밖) |
+| 길이 | 최소 글자 수, 최대 글자 수 | 입력란 (`length_min`, `length_max`) | `length.min`, `length.max` |
+| 문자 종류 | 영문 대문자, 영문 소문자, 숫자, 특수문자 | 드롭다운: 제한 없음(기본) / 사용 불가 / 사용 가능 / 반드시 포함 (`uppercase`, `lowercase`, `number`, `special`) | `alphabet.uppercase`, `alphabet.lowercase`, `number`, `specialCharacter`의 `allow`, `require`. 제한 없음이면 필드를 뺀다 |
+| 사용 가능한 문자 | 위 네 종류 각각, 허용되는 문자만 나열 | 입력란 (`uppercase_usable` 등). 그 종류가 사용 가능·반드시 포함일 때만 | 각 종류의 `usable` |
+| 영문 필수 | 대소문자 상관없이 영문 1자 이상 | 체크박스 (`alphabet_required`) | `alphabet.require` |
+| 조합 | 몇 가지 이상, 셀 종류(영문, 대문자, 소문자, 숫자, 특수문자) | 숫자 입력란(1부터 셀 종류 개수까지), 체크박스 (`combination_min`, `combination_of`). 종류를 하나도 고르지 않으면 `of`를 뺀다(기본값) | `combination.min`, `combination.of` |
+| 금지 | 같은 문자 연속 최대 개수, 연속 문자 최대 길이, 금지 문자, 아이디 포함 금지 | 입력란·체크박스 (`max_repeat`, `max_sequence`, `forbidden_characters`, `no_id`) | `forbidden.maxRepeat`, `forbidden.maxSequence`, `forbidden.characters`, `forbidden.id` |
+| 참조 | 다른 항목 규칙 그대로 쓰기 | 입력란(도메인) (`ref`). 채우면 다른 규칙 항목은 비워야 함 | `$ref` |
+| 규칙 JSON | `rule.json` 전체 | 선택 입력란 (`rule`). 채우면 그 JSON을 쓰고, 다른 규칙 항목은 비워야 함 | (전체) |
 
-- 항목 값이 스키마 검증(`validateRule`)을 통과하지 못하면 지금처럼 PR을 열지 않고 문제를 이슈 댓글로 알린다.
-- 폼 문구(제목, 항목 이름, 설명)는 영어로 쓴다(2026-11-05 확정). 위 표의 항목 이름은 이 문서용 한국어 설명이다.
+- 규칙 JSON 칸은 익스텐션이 수정 요청 때 지금 규칙을 미리 채우는 자리다. 제보자는 그 JSON을 고치거나, 지우고 항목을 채운다.
+- 규칙 항목, 참조, 규칙 JSON이 모두 비어 있거나 규칙 JSON이 `{}`이면 오류로 알린다. `validateRule`은 `{}`를 허용하지만, 아무것도 제한하지 않는 제보는 이슈 폼에서만 막는다(호승 결정, 2026-11-18).
+- 숫자 칸에 정수가 아닌 값이 있거나, 결과가 스키마 검증(`validateRule`)이나 `$ref` 검사를 통과하지 못하거나, 수정 요청이 지금 규칙과 같으면 PR을 열지 않고 문제를 이슈 댓글로 알린다.
+- 항목 값으로 만든 `rule.json`의 키 순서는 `Rule` 타입 순서(`alphabet`, `number`, `specialCharacter`, `combination`, `forbidden`, `length`)로 늘 같다.
+- 폼 문구(제목, 항목 이름, 설명)는 영어로 쓴다(2026-11-05 확정). 위 표의 항목 이름은 이 문서용 한국어 설명이다. 스크립트는 이슈 본문을 항목 이름(label)으로 읽으므로, 이름을 바꿀 때 `scripts/rule-request.ts`의 `FIELD`도 함께 고친다. 테스트가 둘이 맞는지 검사한다.
 
 ## 6. 배포
 
@@ -191,7 +194,7 @@
 | 할 일 | 상태 | 관련 |
 |---|---|---|
 | 하루 1회 자동 배포 workflow | [계획] | §6.2, api #5 |
-| 항목 입력식 이슈 폼과 JSON 자동 생성 | [계획] | §5.2, chrome #7 |
+| 항목 입력식 이슈 폼과 JSON 자동 생성 | 구현됨 | §5.2, chrome #7 |
 | 규칙 한 줄 문구 함수(현지화) | 구현됨 | §4, chrome #3·#4 |
 | README·CONTRIBUTING을 이 문서와 맞추기 | [계획] | |
 | 18곳 실제 대조 | 1.0 이후 | #5 |
